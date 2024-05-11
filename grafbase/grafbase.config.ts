@@ -1,47 +1,47 @@
-import { graph, connector, config } from '@grafbase/sdk';
+import { graph, config, connector } from '@grafbase/sdk';
+import { JWTAuth, JWTParams } from '@grafbase/sdk/dist/src/auth/jwt'; // Assuming JWT auth
 
 const g = graph.Standalone();
 
-const jwt = connector.JSONWebToken({
-  issuer: 'nextauth',
-  secret: process.env.NEXTAUTH_SECRET
-});
+// Assuming you have a JWT secret stored in an environment variable
+const jwtSecret = process.env.NEXTAUTH_SECRET as string;
 
-g.auth(jwt, {
-  rules: {
-    private: {
-      allow: {
-        isLoggedIn: true
-      }
-    }
-  }
+const jwtAuth = new JWTAuth({
+  issuer: 'nextauth',
+  secret: jwtSecret,
 });
 
 const github = connector.GraphQL('GitHub', {
   url: 'https://api.github.com/graphql',
   headers: (headers) => {
     headers.set('Authorization', { forward: 'Authorization' });
-  }
+  },
 });
 
 g.datasource(github);
 
-const Message = g.model('Message', {
+interface IMessage {
   username: String,
   avatar: String,
   body: String,
   likes: Number,
   dislikes: Number
+}
+
+const Message = g.type('Message', {
+  username: g.string(),
+  avatar: g.string(),
+  body: g.string(),
+  likes: g.int(),
+  dislikes: g.int()
 });
 
 export default config({
   graph: g,
-  cache: {
-    rules: [
-      {
-        types: ['Query'],
-        maxAge: 60
-      }
-    ]
-  }
-});
+  auth: {
+    providers: [github],
+    rules: rules => {
+      rules.private()
+    },
+  },
+})
