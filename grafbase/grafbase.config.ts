@@ -1,4 +1,4 @@
-import { graph, connector, config, Int } from '@grafbase/sdk';
+import { graph, connector, config } from '@grafbase/sdk';
 
 const g = graph.Standalone();
 
@@ -30,8 +30,8 @@ const Message = g.model('Message', {
   username: String,
   avatar: String,
   body: String,
-  likes: Int,
-  dislikes: Int
+  likes: Number,
+  dislikes: Number
 });
 
 export default config({
