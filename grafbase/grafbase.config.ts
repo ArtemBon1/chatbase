@@ -12,9 +12,9 @@ const jwtAuth = new JWTAuth({
 });
 
 const github = connector.GraphQL('GitHub', {
-  url: 'https://chatbase-iota.vercel.app/api/auth/callback/github',
+  url: 'https://api.github.com/graphql',
   headers: (headers) => {
-    headers.set('Authorization', { forward: 'Authorization' });
+    headers.set('Authorization', `Bearer ${process.env.GITHUB_TOKEN}`);
   },
 });
 
